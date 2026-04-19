@@ -60,7 +60,18 @@ jobs:
         run: npm run test:consumer
 
       - name: Publish pacts to broker
-        run: npm run pact:publish
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          for pact_file in pacts/*.json; do
+            consumer=$(node -p "require('./$pact_file').consumer.name")
+            provider=$(node -p "require('./$pact_file').provider.name")
+            echo "Publishing $consumer → $provider @ $VERSION"
+            curl -sf -X PUT \
+              -H "Content-Type: application/json" \
+              -u admin:admin \
+              --data-binary "@$pact_file" \
+              "http://localhost:9292/pacts/provider/${provider}/consumer/${consumer}/version/${VERSION}"
+          done
 
       - name: Run provider verification (reads from broker)
         run: npm run test:provider

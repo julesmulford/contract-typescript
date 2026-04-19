@@ -6,7 +6,7 @@
     "test:consumer": "jest --testPathPattern=consumer --verbose",
     "test:provider": "node --no-deprecation node_modules/.bin/jest --testPathPattern=provider --verbose",
     "test": "jest --verbose --runInBand --testSequencer ./scripts/test-sequencer.js",
-    "pact:publish": "node scripts/publish-pacts.js"
+    "pact:publish": "echo 'Publishing is handled in CI via curl — see .github/workflows/contract-tests.yml'"
   },
   "devDependencies": {
     "@pact-foundation/pact": "^13.1.4",
