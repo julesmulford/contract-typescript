@@ -1,0 +1,204 @@
+{
+  "consumer": {
+    "name": "UserConsumer"
+  },
+  "interactions": [
+    {
+      "description": "a request for a missing user",
+      "providerStates": [
+        {
+          "name": "user 99 does not exist"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/users/99"
+      },
+      "response": {
+        "body": {
+          "error": "User not found"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.error": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "status": {}
+        },
+        "status": 404
+      }
+    },
+    {
+      "description": "a request for user 1",
+      "providerStates": [
+        {
+          "name": "user 1 exists"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/users/1"
+      },
+      "response": {
+        "body": {
+          "email": "alice@example.com",
+          "id": 1,
+          "name": "Alice Smith",
+          "role": "admin"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "\\S+@\\S+\\.\\S+"
+                }
+              ]
+            },
+            "$.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.role": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "a request to create a user",
+      "providerStates": [
+        {
+          "name": "the user service is available"
+        }
+      ],
+      "request": {
+        "body": {
+          "email": "carol@example.com",
+          "name": "Carol White",
+          "role": "user"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/users"
+      },
+      "response": {
+        "body": {
+          "email": "carol@example.com",
+          "id": 3,
+          "name": "Carol White",
+          "role": "user"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$.email": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "integer"
+                }
+              ]
+            },
+            "$.name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.role": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          },
+          "header": {},
+          "status": {}
+        },
+        "status": 201
+      }
+    },
+    {
+      "description": "a request to delete user 2",
+      "providerStates": [
+        {
+          "name": "user 2 exists"
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "path": "/users/2"
+      },
+      "response": {
+        "status": 204
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "13.2.0"
+    },
+    "pactRust": {
+      "ffi": "0.4.22",
+      "models": "1.2.3"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "UserService"
+  }
+}

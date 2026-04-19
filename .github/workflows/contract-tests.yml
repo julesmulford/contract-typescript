@@ -1,0 +1,63 @@
+name: Contract Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: pact
+          POSTGRES_PASSWORD: pact
+          POSTGRES_DB: pact
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      pact-broker:
+        image: pact-foundation/pact-broker
+        env:
+          PACT_BROKER_DATABASE_URL: postgres://pact:pact@postgres/pact
+          PACT_BROKER_BASIC_AUTH_USERNAME: admin
+          PACT_BROKER_BASIC_AUTH_PASSWORD: admin
+          PACT_BROKER_PUBLIC_HEARTBEAT: "true"
+        ports:
+          - 9292:9292
+        options: >-
+          --health-cmd "curl -f http://localhost:9292/diagnostic/status/heartbeat"
+          --health-interval 10s
+          --health-timeout 10s
+          --health-retries 10
+
+    env:
+      PACT_BROKER_BASE_URL: http://localhost:9292
+      PACT_BROKER_USERNAME: admin
+      PACT_BROKER_PASSWORD: admin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run consumer tests (generates pact file)
+        run: npm run test:consumer
+
+      - name: Publish pacts to broker
+        run: npm run pact:publish
+
+      - name: Run provider verification (reads from broker)
+        run: npm run test:provider
