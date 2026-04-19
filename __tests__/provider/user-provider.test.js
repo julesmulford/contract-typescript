@@ -20,6 +20,7 @@ const pactSource = brokerUrl
       pactBrokerUrl: brokerUrl,
       pactBrokerUsername: process.env.PACT_BROKER_USERNAME,
       pactBrokerPassword: process.env.PACT_BROKER_PASSWORD,
+      consumerVersionSelectors: [{ latest: true }],
     }
   : {
       pactUrls: [path.resolve(process.cwd(), 'pacts', 'UserConsumer-UserService.json')],
